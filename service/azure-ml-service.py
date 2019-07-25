@@ -71,10 +71,10 @@ def run_ml():
 
     # get entities from request
     entities = request.get_json()
-
+    print(type(entities))
     entity_id = entities.get('_id')
     print(type(entity_id))
-    
+
     # create the response
     return Response(get_ML_result(entity_id, entities), mimetype='application/json')
 
