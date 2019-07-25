@@ -47,6 +47,10 @@ def run_ml():
         return(json.dumps(request_json))
 
     def get_ML_result(entities):
+
+        entity_id = entities["_id"]
+        print(entity_id)
+
         request_json = format_Request(entities)
         #print(str(request_json))
         headers = {
@@ -57,14 +61,18 @@ def run_ml():
         data_json = json.loads(data.text)
 
         properties = {}
+        properties['_id'] = entity_id
 
         for index, entity in enumerate(data_json['Results']['output1']['value']['ColumnNames']):
             properties[str(entity).replace(" ","-")] = data_json['Results']['output1']['value']['Values'][0][index]
+
+
 
         yield json.dumps(properties)
 
     # get entities from request
     entities = request.get_json()
+
 
     # create the response
     return Response(get_ML_result(entities), mimetype='application/json')
