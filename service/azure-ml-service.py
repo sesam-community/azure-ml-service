@@ -46,9 +46,8 @@ def run_ml():
         request_json["GlobalParameters"] = globalparams 
         return(json.dumps(request_json))
 
-    def get_ML_result(entities):
-        print(entities['_id'])
-        entity_id = entities['_id']
+    def get_ML_result(entity_id, entities):
+
         print(entity_id)
 
         request_json = format_Request(entities)
@@ -72,10 +71,12 @@ def run_ml():
 
     # get entities from request
     entities = request.get_json()
+    
+    entity_id = entities['_id']
 
-
+    print(type(entity_id))
     # create the response
-    return Response(get_ML_result(entities), mimetype='application/json')
+    return Response(get_ML_result(entity_id, entities), mimetype='application/json')
 
 
 if __name__ == '__main__':
