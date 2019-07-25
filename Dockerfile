@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3-slim
 COPY ./service /service
 WORKDIR /service
 RUN pip install -r requirements.txt
