@@ -48,7 +48,7 @@ def run_ml():
 
     def get_ML_result(entities):
 
-        entity_id = entities["_id"]
+        entity_id = entities['_id']
         print(entity_id)
 
         request_json = format_Request(entities)
