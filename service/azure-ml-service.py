@@ -32,23 +32,29 @@ def run_ml():
         values = []
         globalparams = {}
 
-        for index, entity in enumerate(entities):
-            #print("entity "+entity+" : " + str(entities[entity]))
-            if entity[0] != "_":
-                colnames.append(entity.split(":",2)[1])
-                values.append(entities[entity])
-        values_list.append(values)
+        for listindex, listitem in enumerate(entities):
+
+            for index, entity in enumerate(listitem):
+
+                if entity[0] != "_":
+                    if listindex == 0:
+                        colnames.append(entity.split(":",2)[1])
+                    values.append(listitem[entity])
+            values_list.append(values)
+            values = []
+
         input1["ColumnNames"] = colnames
         input1["Values"] = values_list
         inputs["input1"] = input1
         request_json = {}
         request_json["Inputs"] = inputs
         request_json["GlobalParameters"] = globalparams 
+
         return(json.dumps(request_json))
 
-    def get_ML_result(entity_id, entities):
+    def get_ML_result(ids_list,entities):
 
-        print(entity_id)
+        #print(entity_id)
 
         request_json = format_Request(entities)
         #print(str(request_json))
@@ -58,27 +64,40 @@ def run_ml():
             }
         data = requests.post("https://ussouthcentral.services.azureml.net/workspaces/f139d7eda47d4d65ad14e0a592a015a0/services/6d3d9b7d503b4cca9a42d1be4107d700/execute?api-version=2.0&details=true", headers=headers, data=request_json)
         data_json = json.loads(data.text)
+        #print(data_json)
 
-        properties = {}
-        properties['_id'] = entity_id
+        colnames = []
+        for index, colname in enumerate(data_json['Results']['output1']['value']['ColumnNames']):
+            colnames.append(colname)
 
-        for index, entity in enumerate(data_json['Results']['output1']['value']['ColumnNames']):
-            properties[str(entity).replace(" ","-")] = data_json['Results']['output1']['value']['Values'][0][index]
+        #print (colnames)
 
+        entities_result = []
 
+        for item_index, value_item in enumerate(data_json['Results']['output1']['value']['Values']):
+            properties = {}
+            properties["_id"] = ids_list[item_index]
+            for col_index, colname in enumerate(colnames):
+                properties[str(colname).replace(" ","-")] = data_json['Results']['output1']['value']['Values'][item_index][col_index]
+            entities_result.append(properties)
 
-        yield json.dumps(properties)
+        #print(entities_result)
+
+        yield json.dumps(entities_result)
 
     # get entities from request
     entities = request.get_json()
-    print(type(entities))
-    print(entities)
- #   entity_id = entities.get('_id')
-#    print(type(entity_id))
 
+    # store _ids - order is maintained in the Azure ML webservice
+    ids_list = []
+
+    for i, k in enumerate(entities):
+        ids_list.append(k['_id'])
+
+    print(ids_list)
     # create the response
 #    return Response(get_ML_result(entity_id, entities), mimetype='application/json')
-    return Response(get_ML_result("1", entities), mimetype='application/json')
+    return Response(get_ML_result(ids_list,entities), mimetype='application/json')
 
 
 if __name__ == '__main__':
