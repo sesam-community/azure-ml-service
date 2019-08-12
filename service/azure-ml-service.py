@@ -38,7 +38,10 @@ def run_ml():
 
                 if entity[0] != "_":
                     if listindex == 0:
-                        colnames.append(entity.split(":",2)[1])
+                        if ':' in entity:
+                            colnames.append(entity.split(":",2)[1])
+                        else:
+                            colnames.append(entity)
                     values.append(listitem[entity])
             values_list.append(values)
             values = []
