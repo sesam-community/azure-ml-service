@@ -72,6 +72,7 @@ def run_ml():
     # get entities from request
     entities = request.get_json()
     print(type(entities))
+    print(entities)
  #   entity_id = entities.get('_id')
 #    print(type(entity_id))
 
